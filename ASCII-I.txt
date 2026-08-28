@@ -1,2 +1,5 @@
 Nombre: César Alejandro Domínguez Orihuela
 Clase: Tópicos Avanzados de Programación (TAP)
+CONTINUACION V2
+Catedrático: Jorge Estudillo Ramírez 
+Hora: 09:00 - 10:00
