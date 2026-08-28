@@ -3,3 +3,9 @@ Clase: Tópicos Avanzados de Programación (TAP)
 CONTINUACION V2
 Catedrático: Jorge Estudillo Ramírez 
 Hora: 09:00 - 10:00
+CONTINUACION V3 (MODIFICACION)
+Clave: 4J3
+Grupo: A
+CONTINUACION DE RESET DESDE LA VERSION 2 
+Plantel: Instituto Tecnológico de Veracruz
+
