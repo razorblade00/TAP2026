@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940176215993",
+    "project_id": "chatapp-mensajeria",
+    "storage_bucket": "chatapp-mensajeria.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940176215993:android:3e16070d84b18791da3068",
+        "android_client_info": {
+          "package_name": "com.example.fakesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKGsNKeElXVxta4yZDdpI_rLQyxRwNWsQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

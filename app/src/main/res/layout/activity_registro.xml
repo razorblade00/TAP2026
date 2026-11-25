@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="28dp"
+        android:background="#F4F6FA">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Crear cuenta"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:textColor="#2457C5" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="30dp"
+            android:text="Únete a Fakesapp"
+            android:textSize="16sp"
+            android:textColor="#555555" />
+
+        <EditText
+            android:id="@+id/etNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre"
+            android:inputType="textPersonName"
+            android:singleLine="true"
+            android:padding="14dp" />
+
+        <EditText
+            android:id="@+id/etCorreoRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:hint="Correo electrónico"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:padding="14dp" />
+
+        <EditText
+            android:id="@+id/etContrasenaRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:hint="Contraseña"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:padding="14dp" />
+
+        <Button
+            android:id="@+id/btnRegistrar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Crear cuenta"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:id="@+id/tvVolverLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="¿Ya tienes una cuenta? Inicia sesión"
+            android:textColor="#2457C5"
+            android:textSize="15sp"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+</ScrollView>
