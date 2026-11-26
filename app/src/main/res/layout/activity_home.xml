@@ -35,10 +35,26 @@
         android:textColor="#555555" />
 
     <Button
-        android:id="@+id/btnCerrarSesion"
+        android:id="@+id/btnEditarPerfil"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="35dp"
+        android:text="Editar perfil"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnDirectorio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Directorio de usuarios"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Cerrar sesión"
         android:textAllCaps="false" />
 

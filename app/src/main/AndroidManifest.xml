@@ -14,6 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Fakesapp">
         <activity
+            android:name=".DirectorioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditarPerfilActivity"
+            android:exported="false" />
+        <activity
             android:name=".RecuperarContrasenaActivity"
             android:exported="false" />
 

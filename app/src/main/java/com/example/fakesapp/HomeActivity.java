@@ -14,20 +14,24 @@ public class HomeActivity extends AppCompatActivity {
 
     private TextView tvBienvenida;
     private Button btnCerrarSesion;
+    private Button btnDirectorio;
+    private Button btnEditarPerfil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        // Vincular los elementos de la interfaz
         tvBienvenida = findViewById(R.id.tvBienvenida);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+        btnDirectorio = findViewById(R.id.btnDirectorio);
+        btnEditarPerfil = findViewById(R.id.btnEditarPerfil);
 
         // Recuperar informacion de la sesion
         JSONObject sesion = SessionManager.obtenerSesion(this);
 
         if (sesion == null) {
-
             regresarLogin();
             return;
         }
@@ -41,6 +45,31 @@ public class HomeActivity extends AppCompatActivity {
                 "¡Bienvenido a Fakesapp!\n\n" + correo
         );
 
+        // Abrir el directorio de usuarios
+        btnDirectorio.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    DirectorioActivity.class
+            );
+
+            startActivity(intent);
+
+        });
+
+        // Abrir la edicion del perfil
+        btnEditarPerfil.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    HomeActivity.this,
+                    EditarPerfilActivity.class
+            );
+
+            startActivity(intent);
+
+        });
+
+        // Cerrar sesion
         btnCerrarSesion.setOnClickListener(v -> cerrarSesion());
     }
 
@@ -94,6 +123,7 @@ public class HomeActivity extends AppCompatActivity {
                                                 + "la revocación en Supabase.",
                                         Toast.LENGTH_LONG
                                 ).show();
+
                             });
                         }
                     }

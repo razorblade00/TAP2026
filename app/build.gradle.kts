@@ -88,8 +88,8 @@ dependencies {
 
     // Comunicación HTTP con Supabase
     implementation("com.squareup.okhttp3:okhttp:5.5.1")
-
-
+    // RECYCLERVIEW
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
     // ===================================
     // DEPENDENCIAS ORIGINALES
     // ===================================
