@@ -1,61 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="28dp"
     android:background="#F4F6FA">
 
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- BARRA SUPERIOR CON TITULO Y FOTO DE PERFIL PROPIA -->
+        <LinearLayout
+            android:id="@+id/barraSuperiorHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2457C5"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="14dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fakesapp"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/ivPerfilPropio"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_avatar"
+                android:clipToOutline="true"
+                android:clickable="true"
+                android:contentDescription="Opciones de mi perfil"
+                android:focusable="true"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_camera" />
+
+        </LinearLayout>
+
+        <!-- BUSCADOR SUPERIOR DE CONTACTOS PARA INICIAR CONVERSACION -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#2457C5"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="12dp">
+
+            <EditText
+                android:id="@+id/etBuscarEnHome"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="#FFFFFF"
+                android:drawableStart="@android:drawable/ic_menu_search"
+                android:drawablePadding="8dp"
+                android:hint="Buscar contacto para iniciar chat..."
+                android:imeOptions="actionSearch"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:paddingHorizontal="12dp"
+                android:textColor="#202020"
+                android:textColorHint="#777777"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- INDICADOR DE ESTADO / SECCION -->
+        <TextView
+            android:id="@+id/tvEstadoHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:text="Chats recientes"
+            android:textColor="#555555"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <!-- CONTENEDOR DE LISTAS: CHATS RECIENTES O RESULTADOS DE BUSQUEDA -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- 1. Lista principal de conversaciones (Fase 5) -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvConversaciones"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="80dp" />
+
+            <!-- 2. Lista de contactos filtrados al escribir en el buscador -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvResultadosBusqueda"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"
+                android:clipToPadding="false"
+                android:paddingBottom="80dp"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </LinearLayout>
+
+    <!-- BOTON FLOTANTE PARA ABRIR EL DIRECTORIO COMPLETO DE CONTACTOS -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabDirectorio"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Fakesapp"
-        android:textSize="34sp"
-        android:textStyle="bold"
-        android:textColor="#2457C5" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="Nuevo chat"
+        android:src="@android:drawable/ic_dialog_email"
+        app:backgroundTint="#2457C5"
+        app:tint="#FFFFFF" />
 
-    <TextView
-        android:id="@+id/tvBienvenida"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:gravity="center"
-        android:text="Bienvenido"
-        android:textSize="20sp"
-        android:textColor="#333333" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:gravity="center"
-        android:text="Tu sesión se encuentra activa."
-        android:textSize="15sp"
-        android:textColor="#555555" />
-
-    <Button
-        android:id="@+id/btnEditarPerfil"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        android:text="Editar perfil"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btnDirectorio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Directorio de usuarios"
-        android:textAllCaps="false" />
-
-    <Button
-        android:id="@+id/btnCerrarSesion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Cerrar sesión"
-        android:textAllCaps="false" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

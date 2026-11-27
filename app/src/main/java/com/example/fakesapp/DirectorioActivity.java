@@ -251,43 +251,74 @@ public class DirectorioActivity extends AppCompatActivity {
                 }
         );
     }
-    // =========================================
-// SELECCIONAR DESTINATARIO
 // =========================================
+    // SELECCIONAR DESTINATARIO Y CREAR/OBTENER CHAT
+    // =========================================
 
     private void seleccionarDestinatario(Usuario usuario) {
 
         new AlertDialog.Builder(this)
                 .setTitle("Seleccionar destinatario")
                 .setMessage(
-                        "¿Deseas seleccionar a "
-                                + usuario.getDisplayName()
-                                + " para iniciar una conversación?"
+                        "¿Deseas seleccionar a " + usuario.getDisplayName()+ " para iniciar una conversación?"
                 )
                 .setNegativeButton("Cancelar", (dialog, which) -> {
                     dialog.dismiss();
                 })
                 .setPositiveButton("Seleccionar", (dialog, which) -> {
 
-                    // Guardar los datos del usuario seleccionado
                     destinatarioSeleccionado = usuario;
-
                     destinatarioId = usuario.getId();
                     destinatarioNombre = usuario.getDisplayName();
                     destinatarioFoto = usuario.getAvatarUrl();
 
-                    // Mostrar confirmación
+                    if (accessToken == null || accessToken.isEmpty()) {
+                        tvEstadoDirectorio.setText("Error: no hay token de sesión activo.");
+                        return;
+                    }
+
+                    if (destinatarioId == null || destinatarioId.isEmpty()) {
+                        tvEstadoDirectorio.setText("Error: el contacto no tiene un ID válido.");
+                        return;
+                    }
+
                     tvEstadoDirectorio.setText(
-                            "Destinatario seleccionado: "
-                                    + destinatarioNombre
+                            "Preparando conversación con " + destinatarioNombre + "..."
                     );
 
-                    android.widget.Toast.makeText(
-                            DirectorioActivity.this,
-                            "Destinatario seleccionado correctamente.",
-                            android.widget.Toast.LENGTH_LONG
-                    ).show();
+                    ConversationRepository repository = new ConversationRepository();
+                    repository.getOrCreateDirectConversation(
+                            accessToken,
+                            destinatarioId,
+                            new ConversationRepository.CreateConversationCallback() {
 
+                                @Override
+                                public void onSuccess(String conversationId) {
+                                    tvEstadoDirectorio.setText(
+                                            "Conversación lista con " + destinatarioNombre
+                                    );
+
+                                    android.widget.Toast.makeText(
+                                            DirectorioActivity.this,
+                                            "Conversación lista (" + conversationId + ")",
+                                            android.widget.Toast.LENGTH_LONG
+                                    ).show();
+                                }
+
+                                @Override
+                                public void onError(String errorMessage) {
+                                    tvEstadoDirectorio.setText(
+                                            "Error al crear conversación: " + errorMessage
+                                    );
+
+                                    android.widget.Toast.makeText(
+                                            DirectorioActivity.this,
+                                            errorMessage,
+                                            android.widget.Toast.LENGTH_LONG
+                                    ).show();
+                                }
+                            }
+                    );
                 })
                 .show();
     }
