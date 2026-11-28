@@ -59,17 +59,37 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.MessageV
     public void actualizarMensajes(List<MessageItem> nuevosMensajes) {
         messages.clear();
         if (nuevosMensajes != null) {
-            messages.addAll(nuevosMensajes);
+            for (MessageItem item : nuevosMensajes) {
+                if (item != null && !contieneMensaje(item.getId())) {
+                    messages.add(item);
+                }
+            }
         }
         notifyDataSetChanged();
     }
 
-    public void agregarMensaje(MessageItem nuevoMensaje) {
+    public boolean agregarMensaje(MessageItem nuevoMensaje) {
         if (nuevoMensaje == null) {
-            return;
+            return false;
+        }
+        if (contieneMensaje(nuevoMensaje.getId())) {
+            return false;
         }
         messages.add(nuevoMensaje);
         notifyItemInserted(messages.size() - 1);
+        return true;
+    }
+
+    public boolean contieneMensaje(String messageId) {
+        if (messageId == null || messageId.trim().isEmpty()) {
+            return false;
+        }
+        for (MessageItem existing : messages) {
+            if (messageId.equals(existing.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String formatearHora(String isoDate) {

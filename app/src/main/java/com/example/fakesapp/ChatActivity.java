@@ -3,6 +3,10 @@ package com.example.fakesapp;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -32,6 +36,8 @@ public class ChatActivity extends AppCompatActivity {
     public static final String EXTRA_OTHER_USER_NAME = "other_user_name";
     public static final String EXTRA_OTHER_USER_AVATAR = "other_user_avatar";
 
+    private static final long TYPING_STOP_DELAY_MS = 1500L;
+
     private View barraSuperiorChat;
     private View barraInferiorChat;
     private ImageButton btnVolverChat;
@@ -46,13 +52,20 @@ public class ChatActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
 
     private final ExecutorService avatarExecutor = Executors.newSingleThreadExecutor();
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
+    private Runnable stopTypingRunnable;
 
     private String accessToken = "";
     private String currentUserId = null;
     private String conversationId = "";
     private String otherUserName = "Chat";
     private String otherUserAvatar = "";
+
     private boolean enviando = false;
+    private boolean estaEscribiendoLocal = false;
+    private boolean peerTyping = false;
+    private boolean peerOnline = false;
+    private boolean historialCargado = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,8 +127,28 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         btnEnviarMensaje.setOnClickListener(v -> intentarEnviarMensaje());
+        configurarDetectorEscritura();
 
         inicializarUsuarioYMensajes();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (currentUserId != null && !currentUserId.isEmpty() && !conversationId.isEmpty()) {
+            conectarTiempoReal();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        detenerEstadoEscrituraLocal();
+        if (messageRepository != null) {
+            messageRepository.disconnectRealtime();
+        }
+        peerTyping = false;
+        peerOnline = false;
+        super.onStop();
     }
 
     private void configurarInsets() {
@@ -148,6 +181,56 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private void configurarDetectorEscritura() {
+        stopTypingRunnable = () -> {
+            if (estaEscribiendoLocal) {
+                estaEscribiendoLocal = false;
+                messageRepository.sendTypingStatus(false);
+            }
+        };
+
+        etMensaje.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (currentUserId == null || conversationId.isEmpty()) {
+                    return;
+                }
+
+                uiHandler.removeCallbacks(stopTypingRunnable);
+
+                boolean tieneTexto = s != null && !s.toString().trim().isEmpty();
+                if (tieneTexto) {
+                    if (!estaEscribiendoLocal) {
+                        estaEscribiendoLocal = true;
+                        messageRepository.sendTypingStatus(true);
+                    }
+                    uiHandler.postDelayed(stopTypingRunnable, TYPING_STOP_DELAY_MS);
+                } else if (estaEscribiendoLocal) {
+                    estaEscribiendoLocal = false;
+                    messageRepository.sendTypingStatus(false);
+                }
+            }
+        });
+    }
+
+    private void detenerEstadoEscrituraLocal() {
+        uiHandler.removeCallbacks(stopTypingRunnable);
+        if (estaEscribiendoLocal) {
+            estaEscribiendoLocal = false;
+            if (messageRepository != null) {
+                messageRepository.sendTypingStatus(false);
+            }
+        }
+    }
+
     private void inicializarUsuarioYMensajes() {
         tvEstadoChat.setText("Conectando...");
 
@@ -161,6 +244,7 @@ public class ChatActivity extends AppCompatActivity {
                             messageAdapter = new MessageAdapter(currentUserId);
                             rvMensajes.setAdapter(messageAdapter);
                             cargarMensajes();
+                            conectarTiempoReal();
                         });
                     }
 
@@ -170,6 +254,59 @@ public class ChatActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    private void conectarTiempoReal() {
+        if (messageRepository == null || currentUserId == null || conversationId.isEmpty()) {
+            return;
+        }
+
+        messageRepository.connectRealtime(
+                accessToken,
+                conversationId,
+                currentUserId,
+                new MessageRepository.RealtimeChatCallback() {
+                    @Override
+                    public void onNewMessage(MessageItem message) {
+                        if (messageAdapter != null && message != null) {
+                            boolean agregado = messageAdapter.agregarMensaje(message);
+                            if (agregado) {
+                                rvMensajes.scrollToPosition(messageAdapter.getItemCount() - 1);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onPeerTypingChanged(boolean isTyping) {
+                        peerTyping = isTyping;
+                        actualizarTextoEstadoContacto();
+                    }
+
+                    @Override
+                    public void onPeerPresenceChanged(boolean isOnline) {
+                        peerOnline = isOnline;
+                        if (!isOnline) {
+                            peerTyping = false;
+                        }
+                        actualizarTextoEstadoContacto();
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        // Mantiene la conversación funcional vía REST aunque falle el canal en vivo
+                    }
+                }
+        );
+    }
+
+    private void actualizarTextoEstadoContacto() {
+        if (peerTyping) {
+            tvEstadoChat.setText("Escribiendo...");
+        } else if (peerOnline) {
+            tvEstadoChat.setText("En línea");
+        } else if (historialCargado) {
+            tvEstadoChat.setText("Desconectado");
+        }
     }
 
     private void cargarMensajes() {
@@ -185,13 +322,12 @@ public class ChatActivity extends AppCompatActivity {
                 new MessageRepository.FetchMessagesCallback() {
                     @Override
                     public void onSuccess(List<MessageItem> messages) {
+                        historialCargado = true;
                         messageAdapter.actualizarMensajes(messages);
-                        if (messages.isEmpty()) {
-                            tvEstadoChat.setText("Sin mensajes aún");
-                        } else {
-                            tvEstadoChat.setText("En conversación");
+                        if (!messages.isEmpty()) {
                             rvMensajes.scrollToPosition(messageAdapter.getItemCount() - 1);
                         }
+                        actualizarTextoEstadoContacto();
                     }
 
                     @Override
@@ -215,6 +351,7 @@ public class ChatActivity extends AppCompatActivity {
 
         enviando = true;
         btnEnviarMensaje.setEnabled(false);
+        detenerEstadoEscrituraLocal();
 
         messageRepository.sendMessage(
                 accessToken,
@@ -227,11 +364,10 @@ public class ChatActivity extends AppCompatActivity {
                         enviando = false;
                         btnEnviarMensaje.setEnabled(true);
                         etMensaje.setText("");
-                        if (messageAdapter != null) {
-                            messageAdapter.agregarMensaje(sentMessage);
+                        if (messageAdapter != null && messageAdapter.agregarMensaje(sentMessage)) {
                             rvMensajes.scrollToPosition(messageAdapter.getItemCount() - 1);
                         }
-                        tvEstadoChat.setText("En conversación");
+                        actualizarTextoEstadoContacto();
                     }
 
                     @Override
@@ -275,6 +411,10 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        uiHandler.removeCallbacksAndMessages(null);
+        if (messageRepository != null) {
+            messageRepository.disconnectRealtime();
+        }
         avatarExecutor.shutdownNow();
         super.onDestroy();
     }
